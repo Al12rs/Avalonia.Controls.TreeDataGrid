@@ -131,8 +131,8 @@ namespace TreeDataGridDemo.ViewModels
                 {
                     new CheckBoxColumn<FileTreeNodeModel>(
                         null,
-                        x => x.IsChecked,
-                        (o, v) => o.IsChecked = v,
+                        x => x.InnerNode.IsChecked,
+                        (o, v) => o.InnerNode.IsChecked = v,
                         options: new()
                         {
                             CanUserResizeColumn = false,
@@ -181,8 +181,8 @@ namespace TreeDataGridDemo.ViewModels
                 {
                     new CheckBoxColumn<FileTreeNodeModel>(
                         null,
-                        x => x.IsChecked,
-                        (o, v) => o.IsChecked = v,
+                        x => x.InnerNode.IsChecked,
+                        (o, v) => o.InnerNode.IsChecked = v,
                         options: new()
                         {
                             CanUserResizeColumn = false,
@@ -202,7 +202,7 @@ namespace TreeDataGridDemo.ViewModels
                             }),
                         x => x.Children,
                         x => x.HasChildren,
-                        x => x.IsExpanded),
+                        x => x.InnerNode.IsExpanded),
                     new TextColumn<FileTreeNodeModel, long?>(
                         "Size",
                         x => x.Size,
@@ -271,7 +271,7 @@ namespace TreeDataGridDemo.ViewModels
 
                 while (node is not null && components.Count > 0)
                 {
-                    node.IsExpanded = true;
+                    node.InnerNode.IsExpanded = true;
 
                     var component = components.Pop();
                     var i = node.Children.FindIndex(x => string.Equals(x.Name, component, StringComparison.OrdinalIgnoreCase));

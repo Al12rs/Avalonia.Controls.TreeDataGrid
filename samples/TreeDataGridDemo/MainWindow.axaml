@@ -82,28 +82,29 @@
             <!-- Template for Name column cells -->
             <DataTemplate x:Key="FileNameCell" DataType="m:FileTreeNodeModel">
               <StackPanel Orientation="Horizontal">
-                <Image Margin="0 0 4 0"
-                       VerticalAlignment="Center">
+                <Image Margin="0 0 4 0" VerticalAlignment="Center">
                   <Image.Source>
                     <MultiBinding Converter="{x:Static vm:FilesPageViewModel.FileIconConverter}">
                       <Binding Path="IsDirectory"/>
-                      <Binding Path="IsExpanded"/>
+                      <Binding Path="InnerNode.IsExpanded"/>
                     </MultiBinding>
                   </Image.Source>
                 </Image>
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                <Button Content="Expand" Command="{CompiledBinding ToggleExpandCommand}"/>
+                <Button Content="ToggleCheck" Command="{CompiledBinding ToggleCheckStateCommand}"/>
+                <Button Content="UpdateInner" Command="{CompiledBinding UpdateInner}"/>
               </StackPanel>
             </DataTemplate>
 
             <!-- Edit template for Name column cells -->
             <DataTemplate x:Key="FileNameEditCell" DataType="m:FileTreeNodeModel">
               <StackPanel Orientation="Horizontal">
-                <Image Margin="0 0 4 0"
-                       VerticalAlignment="Center">
+                <Image Margin="0 0 4 0" VerticalAlignment="Center">
                   <Image.Source>
                     <MultiBinding Converter="{x:Static vm:FilesPageViewModel.FileIconConverter}">
                       <Binding Path="IsDirectory"/>
-                      <Binding Path="IsExpanded"/>
+                      <Binding Path="InnerNode.IsExpanded"/>
                     </MultiBinding>
                   </Image.Source>
                 </Image>

@@ -3,12 +3,31 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Reactive;
 using Avalonia.Threading;
 using ReactiveUI;
 
 namespace TreeDataGridDemo.Models
 {
-    public class FileTreeNodeModel : ReactiveObject, IEditableObject
+
+    public class InnerNodeModel : ReactiveObject
+    {
+        private bool _isExpanded;
+        private bool _isChecked;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+        }
+        
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set => this.RaiseAndSetIfChanged(ref _isChecked, value);
+        }
+    }
+    public class FileTreeNodeModel : ReactiveObject , IEditableObject
     {
         private string _path;
         private string _name;
@@ -18,7 +37,15 @@ namespace TreeDataGridDemo.Models
         private FileSystemWatcher? _watcher;
         private ObservableCollection<FileTreeNodeModel>? _children;
         private bool _hasChildren = true;
-        private bool _isExpanded;
+        // private bool _isExpanded;
+        // private bool _isChecked;
+        private InnerNodeModel _innerNode;
+
+        public ReactiveCommand<Unit, Unit> ToggleExpandCommand { get; }
+        
+        public ReactiveCommand<Unit, Unit> ToggleCheckStateCommand { get; }
+        
+        public ReactiveCommand<Unit, Unit> UpdateInner { get; }
 
         public FileTreeNodeModel(
             string path,
@@ -27,9 +54,25 @@ namespace TreeDataGridDemo.Models
         {
             _path = path;
             _name = isRoot ? path : System.IO.Path.GetFileName(Path);
-            _isExpanded = isRoot;
+            _innerNode = new InnerNodeModel();
+            _innerNode.IsExpanded = isRoot;
             IsDirectory = isDirectory;
             HasChildren = isDirectory;
+
+            ToggleExpandCommand = ReactiveCommand.Create(() =>
+            {
+                _innerNode.IsExpanded = !_innerNode.IsExpanded;
+            });
+            
+            ToggleCheckStateCommand = ReactiveCommand.Create(() =>
+            {
+                _innerNode.IsChecked = !_innerNode.IsChecked;
+            });
+            
+            UpdateInner = ReactiveCommand.Create(() =>
+            {
+                InnerNode = new InnerNodeModel();
+            });
 
             if (!isDirectory)
             {
@@ -37,6 +80,12 @@ namespace TreeDataGridDemo.Models
                 Size = info.Length;
                 Modified = info.LastWriteTimeUtc;
             }
+        }
+
+        public InnerNodeModel InnerNode
+        {
+            get => _innerNode;
+            set => this.RaiseAndSetIfChanged(ref _innerNode, value);
         }
 
         public string Path 
@@ -69,13 +118,17 @@ namespace TreeDataGridDemo.Models
             private set => this.RaiseAndSetIfChanged(ref _hasChildren, value);
         }
 
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
-        }
-
-        public bool IsChecked { get; set; }
+        // public bool IsExpanded
+        // {
+        //     get => _isExpanded;
+        //     set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+        // }
+        //
+        // public bool IsChecked
+        // {
+        //     get => _isChecked; 
+        //     set => this.RaiseAndSetIfChanged(ref _isChecked, value);
+        // }
         public bool IsDirectory { get; }
         public IReadOnlyList<FileTreeNodeModel> Children => _children ??= LoadChildren();
 
