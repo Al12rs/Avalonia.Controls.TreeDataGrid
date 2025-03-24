@@ -64,7 +64,7 @@ namespace Avalonia.Experimental.Data
                 (o, v) => property.SetValue(o, v) :
                 (root, v) =>
                 {
-                    var o = links[^2](root);
+                    var o = links[^1](root);
                     property.SetValue(o, v);
                 };
 
