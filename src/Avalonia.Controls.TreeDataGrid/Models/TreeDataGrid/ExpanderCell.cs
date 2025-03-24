@@ -30,7 +30,7 @@ namespace Avalonia.Controls.Models.TreeDataGrid
             {
                 _subscription.Add(isExpanded.Subscribe(x =>
                 {
-                    if (x.HasValue)
+                    if (x.HasValue && IsExpanded != x.Value)
                         IsExpanded = x.Value;
                 }));
             }
