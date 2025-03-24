@@ -308,12 +308,13 @@ namespace Avalonia.Experimental.Data.Core
 
         private void ChainPropertyChanged(object? sender)
         {
-            if (sender is null)
+            if (sender is null || _chain is null)
                 return;
 
             var index = ChainIndexOf(sender);
-
-            if (index != -1)
+            
+            // Update the subscriptions if an intermediate chain element changes
+            if (index != -1 && index < _chain.Length - 1)
             {
                 StopListeningToChain(index);
                 ListenToChain(index);
