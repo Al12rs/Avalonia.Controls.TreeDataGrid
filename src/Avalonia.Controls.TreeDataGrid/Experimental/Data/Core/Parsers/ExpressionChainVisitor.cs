@@ -21,6 +21,16 @@ namespace Avalonia.Data.Core.Parsers
         {
             var visitor = new ExpressionChainVisitor<TIn>(expression);
             visitor.Visit(expression);
+            
+            // Add the final expression (the last element in the chain)
+            if (visitor._head != null && visitor._head != expression.Body)
+            {
+                var finalLink = Expression.Lambda<Func<TIn, object>>(
+                    Expression.Convert(expression.Body, typeof(object)), 
+                    expression.Parameters);
+                visitor._links.Add(finalLink.Compile());
+            }
+            
             return visitor._links.ToArray();
         }
 
