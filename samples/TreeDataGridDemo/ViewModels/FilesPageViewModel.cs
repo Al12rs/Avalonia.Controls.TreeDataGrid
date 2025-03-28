@@ -202,7 +202,7 @@ namespace TreeDataGridDemo.ViewModels
                             }),
                         x => x.Children,
                         x => x.HasChildren,
-                        x => x.IsExpanded),
+                        x => x.Inner.IsExpanded),
                     new TextColumn<FileTreeNodeModel, long?>(
                         "Size",
                         x => x.Size,
@@ -271,7 +271,7 @@ namespace TreeDataGridDemo.ViewModels
 
                 while (node is not null && components.Count > 0)
                 {
-                    node.IsExpanded = true;
+                    node.Inner.IsExpanded = true;
 
                     var component = components.Pop();
                     var i = node.Children.FindIndex(x => string.Equals(x.Name, component, StringComparison.OrdinalIgnoreCase));

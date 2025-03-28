@@ -9,6 +9,16 @@ using ReactiveUI;
 
 namespace TreeDataGridDemo.Models
 {
+
+    public class Inner : ReactiveObject
+    {
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => this.RaiseAndSetIfChanged(ref _isExpanded, value);
+        }
+    }
     public class FileTreeNodeModel : ReactiveObject, IEditableObject
     {
         private string _path;
@@ -21,6 +31,12 @@ namespace TreeDataGridDemo.Models
         private bool _hasChildren = true;
         private bool _isExpanded;
 
+        private Inner _inner;
+
+        public Inner Inner {
+            get => _inner;
+            set => this.RaiseAndSetIfChanged(ref _inner, value);
+        }
         public ReactiveCommand<Unit, Unit> ToggleExpandedStateCommand { get; }
 
         public FileTreeNodeModel(
@@ -30,13 +46,17 @@ namespace TreeDataGridDemo.Models
         {
             _path = path;
             _name = isRoot ? path : System.IO.Path.GetFileName(Path);
+            _inner = new Inner()
+            {
+                IsExpanded = isRoot
+            };
             _isExpanded = isRoot;
             IsDirectory = isDirectory;
             HasChildren = isDirectory;
 
             ToggleExpandedStateCommand = ReactiveCommand.Create(() =>
             {
-                IsExpanded = !IsExpanded;
+                Inner.IsExpanded = !Inner.IsExpanded;
             });
 
             if (!isDirectory)
