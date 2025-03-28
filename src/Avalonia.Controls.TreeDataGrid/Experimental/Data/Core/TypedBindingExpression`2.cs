@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reactive.Subjects;
@@ -135,7 +135,8 @@ namespace Avalonia.Experimental.Data.Core
 
                 try
                 {
-                    for (var i = from; i < _chain.Length; ++i)
+                    // last index is the property itself, so we don't need to subscribe to it.
+                    for (var i = from; i < _chain.Length - 1; ++i)
                     {
                         var o = _chain[i].Eval(root);
 
@@ -168,7 +169,8 @@ namespace Avalonia.Experimental.Data.Core
 
             if (_chain != null && _root != null && _root.TryGetTarget(out _))
             {
-                for (var i = from; i < _chain.Length; ++i)
+                // last index is the property itself, so we don't need to unsubscribe from it.
+                for (var i = from; i < _chain.Length - 1; ++i)
                 {
                     var link = _chain[i];
 
@@ -311,12 +313,23 @@ namespace Avalonia.Experimental.Data.Core
             if (sender is null)
                 return;
 
-            var index = ChainIndexOf(sender);
+            var senderIndex = ChainIndexOf(sender);
 
-            if (index != -1)
+            if (senderIndex == -1)
             {
-                StopListeningToChain(index);
-                ListenToChain(index);
+                // The sender is not in the chain, so we need to stop listening to it.
+                UnsubscribeToChanges(sender);
+                return;
+            }
+            
+            // If a property on the sender changed, we need to unsubscribe all elements after it in the chain.
+            var changedIndex = senderIndex + 1;
+
+            // last element in the chain is the property itself
+            if (changedIndex < _chain!.Length - 1) 
+            {
+                StopListeningToChain(from: changedIndex);
+                ListenToChain(from: changedIndex);
             }
 
             PublishValue();
