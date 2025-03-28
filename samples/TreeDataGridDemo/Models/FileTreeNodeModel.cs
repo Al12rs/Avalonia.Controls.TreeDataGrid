@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Reactive;
 using Avalonia.Threading;
 using ReactiveUI;
 
@@ -20,6 +21,8 @@ namespace TreeDataGridDemo.Models
         private bool _hasChildren = true;
         private bool _isExpanded;
 
+        public ReactiveCommand<Unit, Unit> ToggleExpandedStateCommand { get; }
+
         public FileTreeNodeModel(
             string path,
             bool isDirectory,
@@ -30,6 +33,11 @@ namespace TreeDataGridDemo.Models
             _isExpanded = isRoot;
             IsDirectory = isDirectory;
             HasChildren = isDirectory;
+
+            ToggleExpandedStateCommand = ReactiveCommand.Create(() =>
+            {
+                IsExpanded = !IsExpanded;
+            });
 
             if (!isDirectory)
             {
